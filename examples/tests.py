@@ -232,7 +232,7 @@ class GroupTestCase(TestCase):
         self.assertEquals(g.dn, 'cn=foogroup,%s' % LdapGroup.base_dn)
         self.assertEquals(g.name, 'foogroup')
         self.assertEquals(g.gid, 1000)
-        self.assertEquals(g.usernames, ['foouser', 'baruser'])
+        self.assertSetEqual(g.usernames, set(['foouser', 'baruser']))
 
         # try to filter non-existent entries
         qs = LdapGroup.objects.filter(name='does_not_exist')
@@ -246,7 +246,7 @@ class GroupTestCase(TestCase):
         self.assertEquals(g.dn, 'cn=foogroup,%s' % LdapGroup.base_dn)
         self.assertEquals(g.name, 'foogroup')
         self.assertEquals(g.gid, 1000)
-        self.assertEquals(g.usernames, ['foouser', 'baruser'])
+        self.assertSetEqual(g.usernames, set(['foouser', 'baruser']))
 
         # try to get a non-existent entry
         self.assertRaises(LdapGroup.DoesNotExist, LdapGroup.objects.get,
@@ -267,7 +267,7 @@ class GroupTestCase(TestCase):
         new = LdapGroup.objects.get(name='newgroup')
         self.assertEquals(new.name, 'newgroup')
         self.assertEquals(new.gid, 1010)
-        self.assertEquals(new.usernames, ['someuser', 'foouser'])
+        self.assertSetEqual(new.usernames, set(['foouser', 'someuser']))
 
     def test_order_by(self):
         # ascending name
@@ -377,7 +377,7 @@ class GroupTestCase(TestCase):
         new = LdapGroup.objects.get(name='foogroup')
         self.assertEquals(new.name, 'foogroup')
         self.assertEquals(new.gid, 1002)
-        self.assertEquals(new.usernames, ['foouser2', u'barusér2'])
+        self.assertSetEqual(new.usernames, set(['foouser2', u'barusér2']))
 
     def test_update_change_dn(self):
         g = LdapGroup.objects.get(name='foogroup')
@@ -396,7 +396,7 @@ class GroupTestCase(TestCase):
         new = LdapGroup.objects.get(name='foogroup2')
         self.assertEquals(new.name, 'foogroup2')
         self.assertEquals(new.gid, 1000)
-        self.assertEquals(new.usernames, ['foouser', 'baruser'])
+        self.assertSetEqual(new.usernames, set(['foouser', 'baruser']))
 
     def test_values(self):
         qs = sorted(LdapGroup.objects.values('name'))
