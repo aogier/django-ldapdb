@@ -170,7 +170,7 @@ class ListField(fields.Field):
     def get_db_prep_save(self, value, connection):
         if not value:
             return None
-        return [x.encode(connection.charset) for x in value]
+        return list(set([x.encode(connection.charset) for x in value]))
 
     def get_prep_lookup(self, lookup_type, value):
         "Perform preliminary non-db specific lookup checks and conversions"
@@ -179,9 +179,14 @@ class ListField(fields.Field):
         raise TypeError("ListField has invalid lookup: %s" % lookup_type)
 
     def to_python(self, value):
+        class _foo(set):
+            def __init__(self, iterable):
+                self.append = self.add
+                super(_foo, self).__init__(iterable)
+
         if not value:
-            return []
-        return value
+            return _foo([])
+        return _foo(value)
 
 
 class DateField(fields.DateField):
