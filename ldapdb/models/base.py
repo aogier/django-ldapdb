@@ -62,11 +62,9 @@ class HookableList(list):
         return super(HookableList, self).__getattribute__(attr)
 
     def wrapper(self, *args, **kwargs):
-        print 'wrapping', args
         if not self.hooks.__getattribute__(self.field):
             self.hooks.__setattr__(self.field, list(self))
         ret = self.ret(*args, **kwargs)
-        print 'me: %s - backup: %s' % (self, self.hooks.__getattribute__(self.field))
         return ret
 
 class Model(django.db.models.base.Model):
