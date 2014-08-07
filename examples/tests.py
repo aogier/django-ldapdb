@@ -494,10 +494,14 @@ class UserTestCase(TestCase):
         u = LdapUser.objects.get(username='foouser')
         u.object_classes.append('person')
         u.save()
+        u2 = LdapUser.objects.get(username='foouser')
+        self.assertEqual(u.object_classes, u2.object_classes)
 
-        # make sure DN gets updated if we change the pk
         u.object_classes.remove('person')
-        u.save()
+        u.save()        
+        u2 = LdapUser.objects.get(username='foouser')
+        self.assertEqual(u.object_classes, u2.object_classes)
+
         self.assertEquals(u.object_classes, ['posixAccount', 'shadowAccount', 'inetOrgPerson'])
 
 

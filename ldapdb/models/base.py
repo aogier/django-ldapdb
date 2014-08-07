@@ -61,21 +61,21 @@ class HookableList(list):
             attr = 'wrapper'
         return super(HookableList, self).__getattribute__(attr)
 
-    def __iter__(self):
-        if self.hooks.__getattribute__(self.field):
-            return super(HookableList, self.hooks.__getattribute__(self.field)).__iter__()
-        return super(HookableList, self).__iter__()
-
     def wrapper(self, *args, **kwargs):
+        print 'wrapping', args
         if not self.hooks.__getattribute__(self.field):
             self.hooks.__setattr__(self.field, list(self))
-        return self.ret(*args, **kwargs)
+        ret = self.ret(*args, **kwargs)
+        print 'me: %s - backup: %s' % (self, self.hooks.__getattribute__(self.field))
+        return ret
 
 class Model(django.db.models.base.Model):
     """
     Base class for all LDAP models.
     """
     dn = django.db.models.fields.CharField(max_length=200)
+#     from ldapdb.models.fields import ListField
+#     objectClass = ListField(db_column='objectClass')
 
     # meta-data
     base_dn = None
@@ -85,9 +85,10 @@ class Model(django.db.models.base.Model):
 
     def __getattribute__(self, attr):
         if attr in ['object_classes']:
-            self.object_classes = HookableList(self,
-                                               'original_%s' % attr,
-                                               super(Model, self).__getattribute__(attr))
+            if not isinstance(super(Model, self).__getattribute__(attr), HookableList):
+                self.object_classes = HookableList(self,
+                                                   'original_%s' % attr,
+                                                   super(Model, self).__getattribute__(attr))
         return super(Model, self).__getattribute__(attr)
 
     def __init__(self, *args, **kwargs):
@@ -171,6 +172,11 @@ class Model(django.db.models.base.Model):
                     elif old_value:
                         modlist.append((ldap.MOD_DELETE, field.db_column,
                                         None))
+
+            if self.original_object_classes:
+                
+                modlist.append((ldap.MOD_REPLACE, 'objectClass',
+                                        self.object_classes))
 
             if len(modlist):
                 # handle renaming
