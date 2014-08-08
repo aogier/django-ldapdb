@@ -118,7 +118,7 @@ class Model(django.db.models.base.Model):
         super(Model, self).__init__(*args, **kwargs)
         self.saved_pk = self.pk
         
-#         self.objectClass = self.objectClass or self.object_classes
+        self.objectClass = self.objectClass or self.object_classes
 #         print 'initialized, oc is', self.objectClass
 # 
 #         for attr in self.observables + ['objectClass']:
