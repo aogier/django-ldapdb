@@ -160,25 +160,30 @@ class ListField(fields.Field):
     __metaclass__ = SubfieldBase
 
     def from_ldap(self, value, connection):
+        print 'from ldap', value, connection
         return [x.decode(connection.charset) for x in value]
 
     def get_db_prep_lookup(self, lookup_type, value, connection,
                            prepared=False):
         "Returns field's value prepared for database lookup."
+        print 'get db prep lookup', lookup_type, value, connection, prepared
         return [self.get_prep_lookup(lookup_type, value)]
 
     def get_db_prep_save(self, value, connection):
+        print 'get_db_prep_save', value, connection
         if not value:
             return None
         return [x.encode(connection.charset) for x in value]
 
     def get_prep_lookup(self, lookup_type, value):
         "Perform preliminary non-db specific lookup checks and conversions"
+        print 'get_prep_lookup', lookup_type, value
         if lookup_type == 'contains':
             return escape_ldap_filter(value)
         raise TypeError("ListField has invalid lookup: %s" % lookup_type)
 
     def to_python(self, value):
+        print 'to python', value
         if not value:
             return []
         return value
