@@ -66,16 +66,9 @@ class HookableList(list):
         return super(HookableList, self).__getattribute__(attr)
 
     def wrapper(self, *args, **kwargs):
-        print 'wrapping', args, kwargs
-#         self.observer(self.observer_args, *args)
-        
         if not self.hooks.dirty[self.attr]:
-            print 'saving data', list(self)
             self.hooks.dirty[self.attr] = list(self)
-#         if not self.hooks.__getattribute__(self.field):
-#             self.hooks.__setattr__('%s%s' % (self.prefix, self.field), list(self))
         ret = self.ret(*args, **kwargs)
-        print 'did %s' % self.ret, args, kwargs
         return ret
 
     def bind_to(self, callback, arg):
@@ -96,7 +89,6 @@ class Model(django.db.models.base.Model):
     
     observables = []
     dirty = {}
-#     original_objectClass = []
 
     def backup(self, attr, value):
         print 'backup', value
@@ -104,25 +96,11 @@ class Model(django.db.models.base.Model):
             self.__setattr__('original_%s' % attr, super(Model, self).__getattribute__(attr))
             self.__setattr__(attr, )
     
-#     def __getattribute__(self, attr):
-#         if attr in ['objectClass']:
-#             if not isinstance(super(Model, self).__getattribute__(attr), HookableList):
-#                 hl = HookableList(self,
-#                                     attr,
-#                                     super(Model, self).__getattribute__(attr))
-#                 hl.bind_to(self.backup, attr)
-#                 return hl
-#         return super(Model, self).__getattribute__(attr)
-
     def __init__(self, *args, **kwargs):
         super(Model, self).__init__(*args, **kwargs)
         self.saved_pk = self.pk
         
         self.objectClass = self.objectClass or self.object_classes
-#         print 'initialized, oc is', self.objectClass
-# 
-#         for attr in self.observables + ['objectClass']:
-#             self.__setattr__(attr, HookableList(attr, self))
 
     def build_rdn(self):
         """
@@ -165,8 +143,6 @@ class Model(django.db.models.base.Model):
         if not self.dn:
             # create a new entry
             record_exists = False
-#             entry = [('objectClass', [x for x in query.model._meta.fields
-#                                       if x.name == 'objectClass'][0].default)]
             entry = []
             new_dn = self.build_dn()
 
@@ -204,11 +180,6 @@ class Model(django.db.models.base.Model):
                         modlist.append((ldap.MOD_DELETE, field.db_column,
                                         None))
 
-#             if self.original_object_classes:
-#
-#                 modlist.append((ldap.MOD_REPLACE, 'objectClass',
-#                                         self.object_classes))
-
             if len(modlist):
                 # handle renaming
                 new_dn = self.build_dn()
@@ -227,7 +198,6 @@ class Model(django.db.models.base.Model):
         # done
         self.saved_pk = self.pk
         self.dirty = {}
-#         self.original_objectClass = []
         signals.post_save.send(sender=self.__class__, instance=self,
                                created=(not record_exists))
 
