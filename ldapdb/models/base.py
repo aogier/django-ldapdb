@@ -47,7 +47,7 @@ class Model(django.db.models.base.Model):
     """
     Base class for all LDAP models.
     """
-    dn = django.db.models.fields.CharField(max_length=200)
+    dn = django.db.models.fields.CharField(max_length=200)  # @UndefinedVariable
 
     # meta-data
     base_dn = None
