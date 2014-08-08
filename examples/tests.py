@@ -492,12 +492,12 @@ class UserTestCase(TestCase):
 
     def test_update_objectclass(self):
         u = LdapUser.objects.get(username='foouser')
-        u.object_classes.append('person')
+        u.objectClass.append('person')
         u.save()
         u2 = LdapUser.objects.get(username='foouser')
         self.assertEqual(u.object_classes, u2.object_classes)
 
-        u.object_classes.remove('person')
+        u.objectClass.remove('person')
         u.save()        
         u2 = LdapUser.objects.get(username='foouser')
         self.assertEqual(u.object_classes, u2.object_classes)
