@@ -35,6 +35,10 @@ from django.db.models import fields, SubfieldBase
 from ldapdb import escape_ldap_filter
 
 import datetime
+import cStringIO
+from django.core.files.images import ImageFile
+from django.db.models.fields.files import FieldFile
+from django.core.urlresolvers import reverse
 
 
 class CharField(fields.CharField):
@@ -86,7 +90,54 @@ class CharField(fields.CharField):
         raise TypeError("CharField has invalid lookup: %s" % lookup_type)
 
 
-class ImageField(fields.Field):
+
+class LambdaFieldFile(FieldFile):
+
+    def __init__(self, instance, field, value):
+        if value:
+            name = '/'.join((
+                             reverse('ldapdb-file'),
+                             instance.__class__.__module__,
+#                              field.model.__name__,
+                             instance.__class__.__name__,
+                             instance.pk,
+                             field.name
+                             )) #field.name, 0/0
+        else:
+            name = ''
+        super(LambdaFieldFile, self).__init__(instance, field, name)
+        self.value = value
+
+    def _get_file(self):
+        self._require_file()
+        if not hasattr(self, '_file') or self._file is None:
+            self._file = cStringIO.StringIO(self.value)
+        return self._file
+
+
+    def _set_file(self, file):
+        self._file = file
+
+    def _del_file(self):
+        del self._file
+
+    file = property(_get_file, _set_file, _del_file)
+
+    def __repr__(self):
+        return self.value
+
+    def __str__(self):
+        return self.field.name
+
+class LambdaImageFieldFile(ImageFile, LambdaFieldFile):
+    '''
+
+    '''
+
+
+class ImageField(fields.files.ImageField):
+    attr_class = LambdaImageFieldFile
+
     def from_ldap(self, value, connection):
         if len(value) == 0:
             return ''
@@ -101,11 +152,14 @@ class ImageField(fields.Field):
     def get_db_prep_save(self, value, connection):
         if not value:
             return None
-        return [value]
+        return [str(value)]
 
     def get_prep_lookup(self, lookup_type, value):
         "Perform preliminary non-db specific lookup checks and conversions"
         raise TypeError("ImageField has invalid lookup: %s" % lookup_type)
+
+    def to_python(self, value):
+        return value.read()
 
 
 class IntegerField(fields.IntegerField):

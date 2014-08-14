@@ -39,6 +39,9 @@ from django.db.models import signals
 
 import ldapdb  # noqa
 
+from ldapdb.models.fields import ListField, LambdaFieldFile
+from django.core.files.base import File
+from django.db.models.fields.files import FileField
 
 logger = logging.getLogger('ldapdb')
 
@@ -124,8 +127,12 @@ class Model(django.db.models.base.Model):
             for field in self._meta.fields:
                 if not field.db_column:
                     continue
-                old_value = getattr(orig, field.name, None)
-                new_value = getattr(self, field.name, None)
+                if isinstance(field, FileField):
+                    old_value = getattr(orig, field.name, None).value
+                    new_value = getattr(self, field.name, None).value
+                else:
+                    old_value = getattr(orig, field.name, None)
+                    new_value = getattr(self, field.name, None)
                 if old_value != new_value:
                     new_value = field.get_db_prep_save(new_value, 
                                         connection=connection)
