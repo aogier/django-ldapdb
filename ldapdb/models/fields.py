@@ -95,15 +95,14 @@ class LambdaFieldFile(FieldFile):
 
     def __init__(self, instance, field, value):
         if value:
-            name = '/'.join((
-                             reverse('ldapdb-file'),
-                             instance.__class__.__module__,
-#                              field.model.__name__,
-                             instance.__class__.__name__,
-                             instance.base_dn,
-                             instance.pk,
-                             field.name
-                             )) #field.name, 0/0
+            name = reverse('ldapdb-file',
+                                     args=(
+                                           instance.__class__.__module__,
+                                           instance.__class__.__name__,
+                                           instance.base_dn,
+                                           instance.pk,
+                                           field.name
+                                           )) #field.name, 0/0
         else:
             name = ''
         super(LambdaFieldFile, self).__init__(instance, field, name)
