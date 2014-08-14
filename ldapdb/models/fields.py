@@ -100,6 +100,7 @@ class LambdaFieldFile(FieldFile):
                              instance.__class__.__module__,
 #                              field.model.__name__,
                              instance.__class__.__name__,
+                             instance.base_dn,
                              instance.pk,
                              field.name
                              )) #field.name, 0/0
