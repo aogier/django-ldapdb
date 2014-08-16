@@ -102,7 +102,7 @@ class LambdaFieldFile(FieldFile):
                                            instance.base_dn,
                                            instance.pk,
                                            field.name
-                                           )) #field.name, 0/0
+                                           ))
         else:
             name = ''
         super(LambdaFieldFile, self).__init__(instance, field, name)
@@ -137,6 +137,15 @@ class LambdaImageFieldFile(ImageFile, LambdaFieldFile):
 
 class ImageField(fields.files.ImageField):
     attr_class = LambdaImageFieldFile
+
+    def __init__(self, verbose_name=None, name=None, width_field=None,
+        height_field=None, **kwargs):
+        super(ImageField, self).__init__(upload_to='unused',
+                                         verbose_name=verbose_name,
+                                         name=name,
+                                         width_field=width_field,
+                                         height_field=height_field,
+                                         **kwargs)
 
     def from_ldap(self, value, connection):
         if len(value) == 0:
