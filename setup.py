@@ -26,6 +26,7 @@ setup(
     install_requires=[
         'django>=1.2',
         'python-ldap>=2.0',
+        'pillow',
     ],
     setup_requires=[
         'setuptools>=0.6c11',
