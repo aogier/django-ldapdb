@@ -449,7 +449,7 @@ class UserTestCase(TestCase):
         self.assertEquals(u.home_directory, '/home/foouser')
         self.assertEquals(u.uid, 2000)
         self.assertEquals(u.username, 'foouser')
-        self.assertEquals(u.photo, '\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01'
+        self.assertEquals(u.photo.value, '\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01'
                           '\x01\x00H\x00H\x00\x00\xff\xfe\x00\x1cCreated with '
                           'GIMP on a Mac\xff\xdb\x00C\x00\x05\x03\x04\x04\x04'
                           '\x03\x05\x04\x04\x04\x05\x05\x05\x06\x07\x0c\x08'
