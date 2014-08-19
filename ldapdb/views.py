@@ -15,13 +15,13 @@ def file(request, module, base_dn, model, pk, attr):
     modelClass = getattr(_m, model)
     modelClass.base_dn = unquote(base_dn)
     
-    instance = modelClass.objects.get(pk=pk)
+    instance = modelClass.objects.values(attr).get(pk=pk)
     
     now = datetime.datetime.now()
     html = "<html><body>It is now %s.</body></html>" % now 
-    data = getattr(instance, attr)
+    data = instance[attr]
     
-    imageType = imghdr.what('', h=data.value)
+    imageType = imghdr.what('', h=data)
     if imageType:
         content_type = 'image/%s' % imageType
     else:
