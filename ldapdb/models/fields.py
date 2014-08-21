@@ -184,6 +184,8 @@ class ListField(fields.Field):
                 self.append = self.add
                 super(_foo, self).__init__(iterable)
 
+            def __repr__(self, *args, **kwargs):
+                return ', '.join(sorted(self))
         if not value:
             return _foo([])
         return _foo(value)
